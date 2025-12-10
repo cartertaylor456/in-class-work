@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Snake — Run from the Bird!</title>
+<style>
+  :root{
+    --bg:#0b1220;
+    --accent:#ffd166;
+    --snake:#4ade80;
+    --food:#ff6b6b;
+    --bird:#74c0fc;
+  }
+  body{
+    background:#08121f;
+    color:white;
+    font-family:Arial, sans-serif;
+    display:flex;
+    justify-content:center;
+    padding:20px;
+  }
+  .container{max-width:850px;width:100%;}
+  canvas{background:#0d1b2a;border-radius:8px;width:100%;image-rendering:pixelated;}
+  button{
+    margin:5px; padding:8px 12px;
+    background:#11253d;
+    color:#ffd166;
+    border:1px solid #1d3557;
+    border-radius:6px;
+    cursor:pointer;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>Snake — Run From The Bird!</h2>
+  <div>
+    <button onclick="startGame()">Start</button>
+    <button onclick="pauseGame()">Pause</button>
+    <button onclick="resetGame()">Restart</button>
+  </div>
+  <p id="scoreText">Score: 0</p>
+  <p id="message" style="color:#ff6b6b;font-weight:bold;"></p>
+  <canvas id="game" width="600" height="600"></canvas>
+</div>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+const grid = 24;
+const size = canvas.width / grid;
+
+let snake, direction, nextDirection, food, bird;
+let score = 0;
+let running = false;
+let paused = false;
+let loop;
+
+function initGame() {
+  snake = [
+    { x: 12, y: 12 },
+    { x: 11, y: 12 },
+    { x: 10, y: 12 }
+  ];
+  direction = { x: 1, y: 0 };
+  nextDirection = { x: 1, y: 0 };
+
+  food = spawnFood();
+
+  // 🐦 slower bird
+  bird = {
+    x: 1,
+    y: 1,
+    vx: 0,
+    vy: 0,
+    speed: 0.35,     // MUCH SLOWER than before
+    turnRate: 0.15   // slower turning
+  };
+
+  score = 0;
+  document.getElementById("scoreText").textContent = "Score: " + score;
+  document.getElementById("message").textContent = "";
+  draw();
+}
+
+function spawnFood() {
+  let pos;
+  const occupied = new Set(snake.map(s => s.x + "," + s.y));
+  do {
+    pos = {
+      x: Math.floor(Math.random() * grid),
+      y: Math.floor(Math.random() * grid)
+    };
+  } while (occupied.has(pos.x + "," + pos.y));
+  return pos;
+}
+
+function startGame() {
+  if (running && !paused) return;
+  paused = false;
+  running = true;
+  gameLoop();
+}
+
+function pauseGame() {
+  paused = !paused;
+  if (!paused) gameLoop();
+}
+
+function resetGame() {
+  running = false;
+  paused = false;
+  clearTimeout(loop);
+  initGame();
+}
+
+// Input
+document.addEventListener("keydown", e => {
+  const key = e.key.toLowerCase();
+  const map = {
+    arrowup: {x:0,y:-1}, w:{x:0,y:-1},
+    arrowdown:{x:0,y:1}, s:{x:0,y:1},
+    arrowleft:{x:-1,y:0}, a:{x:-1,y:0},
+    arrowright:{x:1,y:0}, d:{x:1,y:0}
+  };
+  if (map[key]) {
+    const nd = map[key];
+    if (nd.x !== -direction.x || nd.y !== -direction.y) {
+      nextDirection = nd;
+    }
+    if (!running) startGame();
+  }
+});
+
+function gameLoop() {
+  if (!running || paused) return;
+
+  direction = nextDirection;
+
+  // move snake head
+  const head = {
+    x: snake[0].x + direction.x,
+    y: snake[0].y + direction.y
+  };
+
+  // hit wall?
+  if (head.x < 0 || head.x >= grid || head.y < 0 || head.y >= grid) {
+    return endGame("You hit a wall!");
+  }
+
+  // hit self?
+  for (let s of snake) {
+    if (s.x === head.x && s.y === head.y) {
+      return endGame("You hit your own tail!");
+    }
+  }
+
+  snake.unshift(head);
+
+  // eaten candy?
+  if (head.x === food.x && head.y === food.y) {
+    score += 10;
+    document.getElementById("scoreText").textContent = "Score: " + score;
+
+    // 🍬 new candy always pops up
+    food = spawnFood();
+  } else {
+    snake.pop();
+  }
+
+  moveBird();
+  checkBirdCollision();
+  draw();
+
+  loop = setTimeout(gameLoop, 150); // constant speed gameplay
+}
+
+// 🐦 move bird toward snake head (slow!)
+function moveBird() {
+  const targetX = snake[0].x + 0.5;
+  const targetY = snake[0].y + 0.5;
+
+  let dx = targetX - bird.x;
+  let dy = targetY - bird.y;
+  let dist = Math.hypot(dx, dy) || 1;
+
+  dx /= dist;
+  dy /= dist;
+
+  // slow turning
+  bird.vx = (1 - bird.turnRate) * bird.vx + bird.turnRate * dx * bird.speed;
+  bird.vy = (1 - bird.turnRate) * bird.vy + bird.turnRate * dy * bird.speed;
+
+  bird.x += bird.vx;
+  bird.y += bird.vy;
+}
+
+function checkBirdCollision() {
+  for (let s of snake) {
+    let d = Math.hypot((s.x + 0.5) - bird.x, (s.y + 0.5) - bird.y);
+    if (d < 0.6) {
+      return endGame("The bird caught you!");
+    }
+  }
+}
+
+function endGame(msg) {
+  running = false;
+  paused = false;
+  clearTimeout(loop);
+  document.getElementById("message").textContent = msg + " Final Score: " + score;
+}
+
+// DRAWING
+function draw() {
+  ctx.fillStyle = "#0d1b2a";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // food
+  ctx.fillStyle = "#ff6b6b";
+  ctx.fillRect(food.x * size + 4, food.y * size + 4, size - 8, size - 8);
+
+  // snake
+  ctx.fillStyle = "#4ade80";
+  snake.forEach((s, i) => {
+    ctx.fillRect(s.x * size + 2, s.y * size + 2, size - 4, size - 4);
+  });
+
+  // bird
+  ctx.fillStyle = "#74c0fc";
+  ctx.beginPath();
+  ctx.arc(bird.x * size, bird.y * size, size * 0.4, 0, Math.PI * 2);
+  ctx.fill();
+}
+initGame();
+</script>
+</body>
+</html>

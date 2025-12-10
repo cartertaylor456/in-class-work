@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ACC Football — Stats &amp; Snapshot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --accent-1: #eaf2ff;
+      --accent-2: #fff7e6;
+      --card-shadow: 0 8px 24px rgba(11,20,40,0.06);
+      --max-width: 1100px;
+      --radius: 14px;
+    }
+    html,body{height:100%;}
+    body{
+      margin:0; font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+      color:#000; /* user asked text all black */
+      background: linear-gradient(180deg,#f7fbff 0%, #fefefc 100%);
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+    }
+    .wrap{max-width:var(--max-width);margin:36px auto;padding:28px;}
+
+    header{display:flex;align-items:center;justify-content:space-between;gap:22px;margin-bottom:22px}
+    .brand{display:flex;align-items:center;gap:14px}
+    .logo{width:60px;height:60px;border-radius:12px;background:linear-gradient(135deg,#ffd4a3,#bfe3ff);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;box-shadow:var(--card-shadow)}
+    h1{font-size:28px;margin:0}
+    p.lead{margin:2px 0 0;font-size:13px;opacity:.9}
+
+    nav{display:flex;gap:12px}
+    .nav a{padding:8px 12px;border-radius:10px;text-decoration:none;font-size:13px}
+    .nav a:hover{background:rgba(0,0,0,0.06)}
+
+    main{display:grid;grid-template-columns:1fr 360px;gap:22px}
+
+    /* Left column content */
+    .card{background:linear-gradient(180deg,rgba(255,255,255,0.9),#fff);border-radius:var(--radius);padding:18px;box-shadow:var(--card-shadow)}
+    .section{margin-bottom:18px}
+    h2{font-size:18px;margin:0 0 10px}
+    small.muted{font-size:12px;display:block;margin-top:6px;color:rgba(0,0,0,0.6)}
+
+    /* Standings table */
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    th,td{padding:10px 8px;text-align:left;border-bottom:1px solid rgba(0,0,0,0.06)}
+    thead th{position:sticky;top:0;background:transparent}
+    th.sortable{cursor:pointer;user-select:none}
+    th .arrow{margin-left:8px;font-size:11px;opacity:.6}
+
+    .team-cell{display:flex;align-items:center;gap:10px}
+    .badge{width:36px;height:24px;border-radius:6px;background:#fff;border:1px solid rgba(0,0,0,0.06);display:inline-flex;align-items:center;justify-content:center;font-weight:600}
+
+    /* Right column */
+    aside{position:relative}
+    .stats-list{display:flex;flex-direction:column;gap:10px}
+    .stat-item{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:12px;background:linear-gradient(180deg,var(--accent-1),#fff);box-shadow:var(--card-shadow)}
+    .stat-title{font-size:13px}
+    .stat-value{font-weight:700;font-size:16px}
+
+    /* Cards grid */
+    .grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+
+    /* Lists */
+    ul.clean{padding-left:18px;margin:0}
+    li{margin-bottom:8px}
+
+    /* Footer */
+    footer{margin-top:22px;font-size:13px;color:rgba(0,0,0,0.7)}
+
+    /* Responsive */
+    @media (max-width:1000px){main{grid-template-columns:1fr}aside{order:2}.wrap{padding:18px}}
+
+    /* small utility */
+    .muted-2{font-size:12px;color:rgba(0,0,0,0.6)}
+    .mini{font-size:12px}
+
+    /* table highlight */
+    tbody tr:hover{background:linear-gradient(90deg,rgba(255,238,204,0.4),rgba(207,241,255,0.2))}
+
+    /* search */
+    .search-row{display:flex;gap:10px;align-items:center}
+    .search-row input{flex:1;padding:10px;border-radius:10px;border:1px solid rgba(0,0,0,0.08)}
+    .pill{padding:6px 10px;border-radius:999px;border:1px solid rgba(0,0,0,0.06);font-size:12px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo">ACC</div>
+        <div>
+          <h1>ACC Football — Stats &amp; Snapshot</h1>
+          <p class="lead">Clean, scrollable single-page stats hub — team standings, leaderboards and quick facts.</p>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="#standings" class="pill">Standings</a>
+        <a href="#leaders" class="pill">Leaderboards</a>
+        <a href="#team-stats" class="pill">Team Stats</a>
+        <a href="#quick-facts" class="pill">Quick Facts</a>
+      </nav>
+    </header>
+
+    <main>
+      <!-- Standings Section -->
+      <section id="standings" class="card section">
+        <h2>ACC Standings</h2>
+        <table>
+          <thead>
+            <tr><th>Team</th><th>W-L</th><th>PPG</th><th>PAPG</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="team-cell"><span class="badge">FSU</span>Florida State</td><td>11-2</td><td>34.1</td><td>18.7</td></tr>
+            <tr><td class="team-cell"><span class="badge">CLEM</span>Clemson</td><td>9-4</td><td>30.2</td><td>20.5</td></tr>
+            <tr><td class="team-cell"><span class="badge">MIA</span>Miami</td><td>8-5</td><td>29.4</td><td>22.8</td></tr>
+            <tr><td class="team-cell"><span class="badge">UNC</span>North Carolina</td><td>8-5</td><td>32.5</td><td>27.3</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Leaderboards Section -->
+      <section id="leaders" class="card section">
+        <h2>Stat Leaderboards</h2>
+        <ul class="clean">
+          <li><strong>Passing Yards Leader:</strong> Drake Maye – 3,608 yds</li>
+          <li><strong>Rushing Leader:</strong> Trey Benson – 905 yds</li>
+          <li><strong>Receiving Leader:</strong> Xavier Legette – 1,255 yds</li>
+          <li><strong>Sacks Leader:</strong> Jared Verse – 9.0</li>
+        </ul>
+      </section>
+
+      <!-- Team Stats Section -->
+      <section id="team-stats" class="card section">
+        <h2>Team Stats Snapshot</h2>
+        <div class="grid-2">
+          <div>
+            <h3>Offense</h3>
+            <ul class="clean">
+              <li>Average PPG: 29.7</li>
+              <li>Total Yards/Game: 412</li>
+              <li>3rd Down Conversion: 42%</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Defense</h3>
+            <ul class="clean">
+              <li>Opponent PPG: 23.3</li>
+              <li>Sacks/Game: 2.6</li>
+              <li>Turnovers Forced: 1.4/game</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Quick Facts Section -->
+      <section id="quick-facts" class="card section">
+        <h2>Quick ACC Facts</h2>
+        <ul class="clean">
+          <li>Current ACC Teams: 17</li>
+          <li>Most Championships: Florida State</li>
+          <li>Average Stadium Capacity: ~55,000</li>
+          <li>Oldest Program: Georgia Tech (1892)</li>
+        </ul>
+      </section>
+
+      
+
+</body>
+  
+  <!-- Enhanced Football Game Section -->
+  <section class="section">
+    <h2 class="section-title">Enhanced Football Game</h2>
+    <p>Use the arrow keys to dodge defenders and reach the endzone. This version is harder with more obstacles.</p>
+    <canvas id="footballGame" width="500" height="300" style="background:#e8e8e8; display:block; margin:20px auto; border-radius:10px;"></canvas>
+  </section>
+
+  <script>
+    const canvas = document.getElementById('footballGame');
+    const ctx = canvas.getContext('2d');
+
+    let player = { x: 20, y: canvas.height / 2 - 15, w: 20, h: 30, speed: 4 };
+    let endzone = { x: canvas.width - 40, w: 20 };
+
+    // More, faster defenders
+    let defenders = [
+      { x: 200, y: 50, w: 20, h: 20, dir: 1, speed: 3 },
+      { x: 300, y: 200, w: 20, h: 20, dir: -1, speed: 4 },
+      { x: 150, y: 150, w: 20, h: 20, dir: 1, speed: 2 },
+      { x: 250, y: 100, w: 20, h: 20, dir: -1, speed: 3 }
+    ];
+
+    let keys = {};
+    document.addEventListener('keydown', (e) => keys[e.key] = true);
+    document.addEventListener('keyup', (e) => keys[e.key] = false);
+
+    function update() {
+      if (keys['ArrowUp'] && player.y > 0) player.y -= player.speed;
+      if (keys['ArrowDown'] && player.y + player.h < canvas.height) player.y += player.speed;
+      if (keys['ArrowLeft'] && player.x > 0) player.x -= player.speed;
+      if (keys['ArrowRight'] && player.x + player.w < canvas.width) player.x += player.speed;
+
+      defenders.forEach(d => {
+        d.y += d.dir * d.speed;
+        if (d.y <= 0 || d.y + d.h >= canvas.height) d.dir *= -1;
+
+        if (
+          player.x < d.x + d.w &&
+          player.x + player.w > d.x &&
+          player.y < d.y + d.h &&
+          player.y + player.h > d.y
+        ) {
+          alert('Tackled! Try again.');
+          player.x = 20;
+          player.y = canvas.height / 2 - 15;
+        }
+      });
+
+      if (player.x + player.w >= endzone.x) {
+        alert('Touchdown!');
+        player.x = 20;
+        player.y = canvas.height / 2 - 15;
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#4caf50';
+      ctx.fillRect(endzone.x, 0, endzone.w, canvas.height);
+
+      ctx.fillStyle = 'black';
+      ctx.fillRect(player.x, player.y, player.w, player.h);
+
+      ctx.fillStyle = 'red';
+      defenders.forEach(d => ctx.fillRect(d.x, d.y, d.w, d.h));
+    }
+
+    function loop() {
+      update();
+      draw();
+      requestAnimationFrame(loop);
+    }
+    loop();
+  </script>
+
+  <!-- Sources Section -->
+  <section class="section">
+    <h2 class="section-title">Sources</h2>
+    <ul>
+      <li><a href="https://theacc.com" target="_blank">Official ACC Website</a></li>
+      <li><a href="https://www.espn.com/college-football/" target="_blank">ESPN College Football</a></li>
+      <li><a href="https://www.sports-reference.com/cfb/" target="_blank">Sports Reference - CFB Statistics</a></li>
+    </ul>
+  </section>
+
+  <!-- Map Section -->
+  <section class="section">
+    <h2 class="section-title">ACC Team Map</h2>
+    <p>Map showing approximate ACC team locations:</p>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/7/79/ACC_Map.png" style="max-width:100%; border-radius:10px;" />
+  </section>
+
+</html>
